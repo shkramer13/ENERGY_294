@@ -1,0 +1,18 @@
+
+M2 is the name of the first NMC cell
+
+H1 is the name of the second NMC cell
+
+CTID refers to "Capacity Test in Discharge"
+
+T25 implies that the experiment was conducted at 25 degrees celcius
+
+T45 implies that the experiment was conducted at 45 degrees celcius
+
+The same applies for T05, T23, T40, T45, and T52
+
+"NMC_Cell_M2_T25_0_05C_CTID" - This is a 1/20 (or) 0.05 C-rate CTID Experiment at T25
+
+"NMC_Cell_M2_T45_0_05C_CTID" - This is a 1/20 (or) 0.05 C-rate CTID Experiment at T45
+
+"NMC_Cell_M2_T25_2C_CTID" - This is a 2 C-rate CTID Experiment at T25

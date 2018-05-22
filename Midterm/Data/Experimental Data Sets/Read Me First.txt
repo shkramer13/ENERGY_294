@@ -1,0 +1,14 @@
+
+H4 is the name of the NMC cell
+
+CTID refers to "Capacity Test in Discharge"
+
+T23 implies that the experiment was conducted at 23 degrees celcius
+
+T45 implies that the experiment was conducted at 45 degrees celcius
+
+"NMC_Cell_H4_T23_0_05C_CTID" - This is a 1/20 (or) 0.05 C-rate CTID Experiment at T23
+
+"NMC_Cell_H4_T23_HPPC_Test" - This is the Hybrid Pulse Power Characterization (HPPC) Experiment at T23
+
+"NMC_Cell_H4_T23_US06_Test" - This is the US06 Experiment at T23

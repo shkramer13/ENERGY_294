@@ -1,0 +1,10 @@
+
+H1 is the name of the NMC cell
+
+CTID refers to "Capacity Test in Discharge"
+
+T23 implies that the experiment was conducted at 23 degrees celcius
+
+"NMC_Cell_H1_T23_1C_CTID" - This is a 1 C-rate CTID Experiment conducted at T23
+
+"NMC_Cell_H1_T23_UDDS" - This is the Urban Dynamometer Driving Schedule (UDDS) Test Experiment conducted at T23
