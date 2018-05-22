@@ -11,27 +11,32 @@ load('../Data/HW4_Data.mat')
 
 % Pull out discharge period from 1C dataset
 discharge1_fit = discharge1;
-start = find(discharge1_fit(:,2) > 0, 1) - 60;
-last = find(discharge1_fit(:,2) > 0, 1, 'last') + 60*15;
+start = find(discharge1_fit(:,2) > 0, 1) - 1;
+last = find(discharge1_fit(:,2) > 0, 1, 'last') + 1;
 % discharge1_fit = discharge1_fit(start:end,:);
 discharge1_fit = discharge1_fit(start:last, :);
 
+%% Calculate Battery Capacity
+
+Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
+
 
 %% Test Model
-
+% 
 % theta0 = get_theta0();
-load('../Data/theta_ga_working.mat')
-
-Vtest = SPM(theta_ga, discharge1_fit)';
+% % load('../Data/theta_ga_working.mat')
+% 
 % Vtest = SPM(theta0, discharge1_fit)';
-
-figure
-hold on
-plot(discharge1_fit(:,1), discharge1_fit(:,3))
-plot(discharge1_fit(:,1), Vtest)
-xlabel('Time (sec)')
-ylabel('Voltage (V)')
-legend('Experimental Data', 'Model Test')
+% % Vtest = SPM(theta_ga, discharge1_fit)';
+% 
+% figure
+% hold on
+% plot(discharge1_fit(:,1), discharge1_fit(:,3))
+% plot(discharge1_fit(:,1), Vtest)
+% xlabel('Time (sec)')
+% ylabel('Voltage (V)')
+% legend('Experimental Data', 'Model Test')
+% ylim([0, 5])
 
 
 %% Parameter Identification
@@ -46,7 +51,8 @@ for i=6:9
 end
 
 % Set solver options
-options = optimoptions('ga', 'MaxGenerations', 200, 'Display', 'iter');
+% options = optimoptions('ga', 'MaxGenerations', 200, 'Display', 'iter');
+options = gaoptimset('Generations', 50, 'Display', 'iter');
 
 % Create matrices for inequality constraints
 A = [-1, 1, zeros(1, 16);
@@ -54,10 +60,10 @@ A = [-1, 1, zeros(1, 16);
 b = [0; 0];
 
 % Fit parameters
-handle = @(x) Cost_Fn(x, discharge1_fit);
-[thetaOpt, RMS] = ga(handle,18,[],[],[],[],thetaLB,thetaUB,@nonlinconst,options);
-% [thetaOpt,RMS] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB, ...
-%                     @nonlinconst, options);
+costfun = @(x) Cost_Fn(x, discharge1_fit);
+nlcfun = @(x) nonlinconst(x, Qnom);
+[thetaOpt,RMS] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB, ...
+                    @nonlinconst, options);
 % [thetaOpt,RMS] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB,[],options);
 % [thetaOpt,RMS] = ga(handle, 18,[],[],[],[], thetaLB, thetaUB,[],options);
 
@@ -69,7 +75,7 @@ Vbatt = SPM(thetaOpt, discharge1_fit);
 figure
 hold on
 plot(discharge1_fit(:,1), discharge1_fit(:,3))
-plot(discharge1_fit(2:end,1), Vbatt)
+plot(discharge1_fit(:,1), Vbatt)
 legend('Experimental Data', 'Model Simulation')
 
 
