@@ -52,7 +52,7 @@ end
 
 % Set solver options
 % options = optimoptions('ga', 'MaxGenerations', 200, 'Display', 'iter');
-options = gaoptimset('Generations', 50, 'Display', 'iter');
+options = gaoptimset('Generations', 5000, 'Display', 'iter');
 
 % Create matrices for inequality constraints
 A = [-1, 1, zeros(1, 16);
@@ -62,21 +62,25 @@ b = [0; 0];
 % Fit parameters
 costfun = @(x) Cost_Fn(x, discharge1_fit);
 nlcfun = @(x) nonlinconst(x, Qnom);
-[thetaOpt,RMS] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB, ...
-                    @nonlinconst, options);
+[thetaOpt,RMS] = ga(costfun, 18, A, b, [], [], thetaLB, thetaUB, ...
+                    nlcfun, options);
 % [thetaOpt,RMS] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB,[],options);
 % [thetaOpt,RMS] = ga(handle, 18,[],[],[],[], thetaLB, thetaUB,[],options);
 
 
+% Save results
+save('results_5_22_1630.mat', 'thetaOpt', 'RMS');
+
+
 %% Plot Results
-
-Vbatt = SPM(thetaOpt, discharge1_fit);
-
-figure
-hold on
-plot(discharge1_fit(:,1), discharge1_fit(:,3))
-plot(discharge1_fit(:,1), Vbatt)
-legend('Experimental Data', 'Model Simulation')
+% 
+% Vbatt = SPM(thetaOpt, discharge1_fit);
+% 
+% figure
+% hold on
+% plot(discharge1_fit(:,1), discharge1_fit(:,3))
+% plot(discharge1_fit(:,1), Vbatt)
+% legend('Experimental Data', 'Model Simulation')
 
 
 %% Compare Models
