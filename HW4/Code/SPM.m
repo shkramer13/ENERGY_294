@@ -188,5 +188,7 @@ V_batt = phi_sp - phi_sn - Rc*I_data;
 %%%%% CHECK %%%%%%%
 V_batt(end) = V_batt(end-1);
 
+V_batt = V_batt';
+
 
 end

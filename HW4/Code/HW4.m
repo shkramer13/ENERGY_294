@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-% cd('~/Dropbox/School/Spring/ENERGY 294/HW4/Code')
+cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
 
 %% Read Data
 load('../Data/HW4_Data.mat')
@@ -75,7 +75,7 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 
 % Set solver options
 % options = optimoptions('ga', 'MaxGenerations', 200, 'Display', 'iter');
-options = gaoptimset('Generations', 5000, 'Display', 'iter');
+options = gaoptimset('Generations', 100, 'Display', 'iter');
 
 % Create matrices for inequality constraints
 A = [-1, 1, zeros(1, 16);
@@ -97,7 +97,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5_22_2030.mat', 'thetaOpt', 'RMS');
+save('results_5_22_2215.mat', 'thetaOpt', 'RMS');
 
 % Load data
 % load('results_5_22_1630.mat')
@@ -138,7 +138,12 @@ save('results_5_22_2030.mat', 'thetaOpt', 'RMS');
 % V_5C = SPM(thetaOpt, discharge5_val);
 % V_UDDS = SPM(thetaOpt, UDDS_val);
 % 
+% % Calculate Error
+% RMS_2C = calc_RMS(discharge2_val(:,3), V_2C);
+% RMS_5C = calc_RMS(discharge5_val(:,3), V_5C);
+% RMS_UDDS = calc_RMS(UDDS_val(:,3), V_UDDS);
 % 
+% % Plot
 % figure
 % 
 % subplot(3,1,1)
@@ -147,21 +152,21 @@ save('results_5_22_2030.mat', 'thetaOpt', 'RMS');
 % plot(discharge2_val(:,1), V_2C)
 % ylabel('Voltage (V')
 % legend('Exp. Data','Model')
-% title('2C Discharge')
+% title(sprintf('2C Discharge: RMS %.3f%%', RMS_2C))
 % 
 % subplot(3,1,2)
 % hold on
 % plot(discharge5_val(:,1), discharge5_val(:,3))
 % plot(discharge5_val(:,1), V_5C)
 % ylabel('Voltage (V')
-% title('5C Discharge')
+% title(sprintf('5C Discharge: RMS %.3f%%', RMS_5C))
 % 
 % subplot(3,1,3)
 % hold on
 % plot(UDDS_val(:,1), UDDS_val(:,3))
 % plot(UDDS_val(:,1), V_UDDS)
 % ylabel('Voltage (V')
-% title('UDDS')
+% title(sprintf('UDDS : RMS %.3f%%', RMS_UDDS))
 
 
 
