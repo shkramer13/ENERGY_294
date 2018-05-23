@@ -119,12 +119,10 @@ for t = 1:length(dt)
     % First grid cell 
     Csn(1,t+1) = Csn(1,t) + dt(t)*((Dsn/dRn^2)*2*(Csn(2,t) - Csn(1,t))); % Anode
     Csp(1,t+1) = Csp(1,t) + dt(t)*((Dsp/dRp^2)*2*(Csp(2,t) - Csp(1,t))); % Cathode
-%     Csn(1,t+1) = Csn(1,t) + dt(t)*((Dsn/dRn^2)*(2*Csn(2,t) - 2*Csn(1,t))); % Anode
-%     Csp(1,t+1) = Csp(1,t) + dt(t)*((Dsp/dRp^2)*(2*Csp(2,t) - 2*Csp(1,t))); % Cathode
     
     for j = 2:N-2
-        Csn(j,t+1) = Csn(j,t) + dt(t)*(Dsn/dRn^2)*((1 + 1/(j-1))*Csn(j+1,t) - 2*Csn(j,t) + (1 - 1/(j-1))*Csn(j-1,t)); % Anode
-        Csp(j,t+1) = Csp(j,t) + dt(t)*(Dsp/dRp^2)*((1 + 1/(j-1))*Csp(j+1,t) - 2*Csp(j,t) + (1 - 1/(j-1))*Csp(j-1,t)); % Cathode
+        Csn(j,t+1) = Csn(j,t) + dt(t)*(Dsn/dRn^2)*((1 + 1/j)*Csn(j+1,t) - 2*Csn(j,t) + (1 - 1/j)*Csn(j-1,t)); % Anode
+        Csp(j,t+1) = Csp(j,t) + dt(t)*(Dsp/dRp^2)*((1 + 1/j)*Csp(j+1,t) - 2*Csp(j,t) + (1 - 1/j)*Csp(j-1,t)); % Cathode
     end
     
     % Overpotential
