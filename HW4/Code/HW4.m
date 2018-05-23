@@ -57,7 +57,7 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 [thetaLB, thetaUB] = get_theta_bounds();
 
 % Set solver options
-options = gaoptimset('Generations', 100, 'Display', 'iter');
+options = gaoptimset('Generations', 10, 'Display', 'iter');
 
 % Create matrices for inequality constraints
 A = [-1, 1, zeros(1, 16);
@@ -79,7 +79,8 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5_23_1000.mat', 'thetaOpt', 'RMS');
+% save('results_test.mat', 'thetaOpt', 'RMS_opt')
+save('results_5_23_1130.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
 % load('results_5_22_2215.mat')
