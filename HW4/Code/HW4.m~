@@ -55,6 +55,7 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 
 % Set upper and lower bounds
 [thetaLB, thetaUB] = get_theta_bounds();
+% load('../Data/bounds.mat')
 
 % Set solver options
 options = gaoptimset('Generations', 100, 'Display', 'iter');
@@ -79,7 +80,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5_23_1000.mat', 'thetaOpt', 'RMS');
+save('results_5_23_0915.mat', 'thetaOpt', 'RMS');
 
 % Load data
 % load('results_5_22_2215.mat')

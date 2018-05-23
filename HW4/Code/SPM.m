@@ -80,8 +80,8 @@ tdim = length(t_data);
 % Concentration arrays 
 % Csn = zeros(N-1, tdim + 1);
 % Csp = zeros(N-1, tdim + 1);
-Csn = zeros(N, tdim + 1);
-Csp = zeros(N, tdim + 1);
+Csn = zeros(N, tdim);
+Csp = zeros(N, tdim);
 
 % Overpotential arrays
 eta_n = zeros(1, tdim);
@@ -149,6 +149,18 @@ for t = 1:length(dt)
     
 end
 
+t = length(t_data);
+
+ % Overpotential
+eta_n(t) = (R*T/(alpha_n*F))*asinh(I_data(t)/(2*Acell*Ln*Asn*i0n));
+eta_p(t) = (R*T/(alpha_p*F))*asinh(I_data(t)/(2*Acell*Lp*Asp*i0p));
+
+%%%%%% !!!!! CHECK THIS !!!!! %%%%%%
+u0n_results(t) = U0n(Csn(N-1,t)/Csn_max);
+u0p_results(t) = U0p(Csp(N-1,t)/Csp_max);
+phi_sn(t) = eta_n(t) + phi_e + U0n(Csn(N-1,t)/Csn_max);
+phi_sp(t) = eta_p(t) + phi_e + U0p(Csp(N-1,t)/Csp_max);
+
 %% Concentration Dynamics - My Version
 % 
 % % Iterate through timesteps
@@ -183,10 +195,6 @@ end
 
 %% Calculate V_batt
 V_batt = phi_sp - phi_sn - Rc*I_data;
-% V_batt = phi_sp - phi_sn - Rc*I_data(2:end);
-
-%%%%% CHECK %%%%%%%
-V_batt(end) = V_batt(end-1);
 
 V_batt = V_batt';
 
