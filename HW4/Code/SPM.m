@@ -121,8 +121,10 @@ for t = 1:length(dt)
     Csp(1,t+1) = Csp(1,t) + dt(t)*((Dsp/dRp^2)*2*(Csp(2,t) - Csp(1,t))); % Cathode
     
     for j = 2:N-2
-        Csn(j,t+1) = Csn(j,t) + dt(t)*(Dsn/dRn^2)*((1 + 1/j)*Csn(j+1,t) - 2*Csn(j,t) + (1 - 1/j)*Csn(j-1,t)); % Anode
-        Csp(j,t+1) = Csp(j,t) + dt(t)*(Dsp/dRp^2)*((1 + 1/j)*Csp(j+1,t) - 2*Csp(j,t) + (1 - 1/j)*Csp(j-1,t)); % Cathode
+%         Csn(j,t+1) = Csn(j,t) + dt(t)*(Dsn/dRn^2)*((1 + 1/j)*Csn(j+1,t) - 2*Csn(j,t) + (1 - 1/j)*Csn(j-1,t)); % Anode
+%         Csp(j,t+1) = Csp(j,t) + dt(t)*(Dsp/dRp^2)*((1 + 1/j)*Csp(j+1,t) - 2*Csp(j,t) + (1 - 1/j)*Csp(j-1,t)); % Cathode
+        Csn(j,t+1) = Csn(j,t) + dt(t)*(Dsn/dRn^2)*((1 + 1/(j-1))*Csn(j+1,t) - 2*Csn(j,t) + (1 - 1/(j-1))*Csn(j-1,t)); % Anode
+        Csp(j,t+1) = Csp(j,t) + dt(t)*(Dsp/dRp^2)*((1 + 1/(j-1))*Csp(j+1,t) - 2*Csp(j,t) + (1 - 1/(j-1))*Csp(j-1,t)); % Cathode
     end
     
     % Overpotential
@@ -141,11 +143,7 @@ for t = 1:length(dt)
     Csn(N-1,t+1) = Csn(N-1,t) + dt(t)*((Dsn/dRn^2)*(2*Csn(N-2,t) - 2*Csn(N-1,t))...
                    - (2 + 2/(N-1))*(J_Li_n(t)/(Asn*F*dRn))); 
     Csp(N-1,t+1) = Csp(N-1,t) + dt(t)*((Dsp/dRp^2)*(2*Csp(N-2,t) - 2*Csp(N-1,t))...
-                   + (2 + 2/(N-1))*(J_Li_p(t)/(Asp*F*dRp)));  
-%     Csn(N-1,t+1) = Csn(N-1,t) + dt(t)*((Dsn/dRn^2)*(2*Csn(N-2,t) - 2*Csn(N-1,t))...
-%                    + (2 + 2/(N-1))*(J_Li_n(t)/(Asn*F*dRn))); 
-%     Csp(N-1,t+1) = Csp(N-1,t) + dt(t)*((Dsp/dRp^2)*(2*Csp(N-2,t) - 2*Csp(N-1,t))...
-%                    - (2 + 2/(N-1))*(J_Li_p(t)/(Asp*F*dRp)));            
+                   + (2 + 2/(N-1))*(J_Li_p(t)/(Asp*F*dRp)));         
     
 end
 
@@ -160,6 +158,19 @@ u0n_results(t) = U0n(Csn(N-1,t)/Csn_max);
 u0p_results(t) = U0p(Csp(N-1,t)/Csp_max);
 phi_sn(t) = eta_n(t) + phi_e + U0n(Csn(N-1,t)/Csn_max);
 phi_sp(t) = eta_p(t) + phi_e + U0p(Csp(N-1,t)/Csp_max);
+
+
+%% Calculate V_batt
+V_batt = phi_sp - phi_sn - Rc*I_data;
+
+V_batt = V_batt';
+
+
+end
+
+
+
+
 
 %% Concentration Dynamics - My Version
 % 
@@ -192,11 +203,3 @@ phi_sp(t) = eta_p(t) + phi_e + U0p(Csp(N-1,t)/Csp_max);
 %     
 % end
 
-
-%% Calculate V_batt
-V_batt = phi_sp - phi_sn - Rc*I_data;
-
-V_batt = V_batt';
-
-
-end

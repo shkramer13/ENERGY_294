@@ -82,16 +82,22 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-% save('results_test.mat', 'thetaOpt', 'RMS_opt')
-save('results_5_23_1400.mat', 'thetaOpt', 'RMS_opt');
+save('results_5_23_1515.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
-% load('results_5_22_2215.mat')
+% load('results_5_23_1400.mat')
+% load('../Data/theta_ga_robert_optimal.mat')
+% theta_ga_robert = theta_ga;
 
 %% Plot Results
 % 
 % % Run simulation
 % Vopt = SPM(thetaOpt, discharge1_fit);
+% 
+% 
+% % % Calculate RMS
+% % Vopt = SPM(theta_ga_robert, discharge1_fit);
+% % RMS_robert = calc_RMS(discharge1_fit(:,3), Vopt)
 % 
 % % Plot results
 % figure
@@ -107,7 +113,7 @@ save('results_5_23_1400.mat', 'thetaOpt', 'RMS_opt');
 % F = 96485;
 % Qn_opt = thetaOpt(12)*F*thetaOpt(5)*thetaOpt(1)*thetaOpt(10)*(thetaOpt(6)-thetaOpt(7))/3600;
 % Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaOpt(8))/3600;
-% 
+
 
 
 %% Validation
