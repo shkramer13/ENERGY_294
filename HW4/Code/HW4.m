@@ -83,7 +83,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 
 % Save results
 % save('results_test.mat', 'thetaOpt', 'RMS_opt')
-save('results_5_23_1150.mat', 'thetaOpt', 'RMS_opt');
+save('results_5_23_1400.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
 % load('results_5_22_2215.mat')
