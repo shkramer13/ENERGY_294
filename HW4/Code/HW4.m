@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-% cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
+cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
 
 %% Read Data
 load('../Data/HW4_Data.mat')
@@ -62,16 +62,21 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 %% Parameter Identification
 
 % Set upper and lower bounds
-% [thetaLB, thetaUB] = get_theta_bounds();
+[thetaLB, thetaUB] = get_theta_bounds();
 % load('../Data/bounds.mat') % Robert's bounds
-load('../Data/bounds_17.mat') % Robert's bounds - 17 parameters
+% load('../Data/bounds_17.mat') % Robert's bounds - 17 parameters
 
 % Set solver options
-options = gaoptimset('Generations', 100, 'Display', 'iter');
+options = gaoptimset('Generations', 5000, 'Display', 'iter');
 
 % Create matrices for inequality constraints
-A = [-1, 1, zeros(1, 16);
-     zeros(1, 9), 1, -1, zeros(1, 7)];
+% 18 parameters
+% A = [-1, 1, zeros(1, 16);
+%      zeros(1, 9), 1, -1, zeros(1, 7)];
+% b = [0; 0];
+% 17 parameters
+A = [-1, 1, zeros(1, 15);
+     zeros(1, 8), 1, -1, zeros(1, 7)];
 b = [0; 0];
 
 % Define anonymous functions
@@ -79,9 +84,9 @@ costfun = @(x) Cost_Fn(x, discharge1_fit);
 nlcfun = @(x) nonlinconst(x, Qnom);
 
 % Fit parameters - 17 variables
-[thetaOpt,RMS_opt]=ga(costfun,17,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
-% [thetaOpt,RMS_opt] = ga(costfun, 17, A, b, [], [], thetaLB, thetaUB, ...
-%                     nlcfun, options); % All constraints
+% [thetaOpt,RMS_opt]=ga(costfun,17,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
+[thetaOpt,RMS_opt] = ga(costfun, 17, A, b, [], [], thetaLB, thetaUB, ...
+                    nlcfun, options); % All constraints
 % [thetaOpt,RMS_opt] = ga(handle, 17, A, b, [], [], thetaLB, thetaUB,[],options); % Linear constraints
 % [thetaOpt,RMS_opt] = ga(costfun, 17,[],[],[],[], thetaLB, thetaUB,[],options); % Unconstrained
 
@@ -96,10 +101,10 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5_23_2110.mat', 'thetaOpt', 'RMS_opt');
+save('../Data/results_5_23_2300.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
-% load('results_5_23_1515.mat')
+% load('../Data/results_5_23_2110.mat')
 % load('../Data/theta_ga_robert_optimal.mat')
 % theta_ga_robert = theta_ga;
 
