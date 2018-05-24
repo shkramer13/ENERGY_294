@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
+% cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
 
 %% Read Data
 load('../Data/HW4_Data.mat')
