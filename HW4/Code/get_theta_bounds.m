@@ -25,8 +25,14 @@ function [LB, UB] = get_theta_bounds()
     
     Acell = [0.08; 0.12];
     
-    bounds = [Ln Lp Rn Rp Acell x100n x0n y100p y0p Csn_max Csp_max eps_sn ...
-            eps_sp i0n i0p Dsn Dsp Rc];
+    % 18 Parameters
+%     bounds = [Ln Lp Rn Rp Acell x100n x0n y100p y0p Csn_max Csp_max eps_sn ...
+%               eps_sp i0n i0p Dsn Dsp Rc];
+
+    % 17 Parameters
+    bounds = [Ln Lp Rn Rp Acell x100n y100p y0p Csn_max Csp_max eps_sn ...
+              eps_sp i0n i0p Dsn Dsp Rc];
+
         
     LB = bounds(1,:);
     UB = bounds(2,:);

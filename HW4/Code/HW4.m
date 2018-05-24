@@ -24,12 +24,17 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 % 
 % % Initial guess
 % theta0 = get_theta0();
-% V0 = SPM(theta0, discharge1_fit);
+% % V0 = SPM(theta0, discharge1_fit); % 18 parameters
+% V0 = SPM_17(theta0, discharge1_fit); % 17 parameters
 % 
 % % Bounds
 % [LB, UB] = get_theta_bounds();
-% Vlb = SPM(LB, discharge1_fit);
-% Vub = SPM(UB, discharge1_fit);
+% % 18 parameters
+% % Vlb = SPM(LB, discharge1_fit);
+% % Vub = SPM(UB, discharge1_fit);
+% % 17 parameters
+% Vlb = SPM_17(LB, discharge1_fit);
+% Vub = SPM_17(UB, discharge1_fit);
 % 
 % % Plot results
 % figure
@@ -45,8 +50,11 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 % 
 % % Calculate capacities
 % F = 96485;
-% Qn_test = theta0(12)*F*theta0(5)*theta0(1)*theta0(10)*(theta0(6)-theta0(7))/3600;
-% Qp_test = theta0(13)*F*theta0(5)*theta0(2)*theta0(11)*(theta0(9)-theta0(8))/3600;
+% % 18 parameters
+% % Qn_test = theta0(12)*F*theta0(5)*theta0(1)*theta0(10)*(theta0(6)-theta0(7))/3600;
+% % Qp_test = theta0(13)*F*theta0(5)*theta0(2)*theta0(11)*(theta0(9)-theta0(8))/3600;
+% % 17 parameters
+% Qp_test = theta0(12)*F*theta0(5)*theta0(2)*theta0(10)*(theta0(8)-theta0(7))/3600;
 % 
 % % Calculate RMS
 % RMS_test = sqrt(mean((V0 - discharge1_fit(:,3)).^2)) / mean(discharge1_fit(:,3)) * 100;
@@ -55,9 +63,8 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 
 % Set upper and lower bounds
 % [thetaLB, thetaUB] = get_theta_bounds();
-load('../Data/bounds.mat') % Robert's bounds
-thetaLB = xlb;
-thetaUB = xub;
+% load('../Data/bounds.mat') % Robert's bounds
+load('../Data/bounds_17.mat') % Robert's bounds - 17 parameters
 
 % Set solver options
 options = gaoptimset('Generations', 100, 'Display', 'iter');
@@ -71,8 +78,15 @@ b = [0; 0];
 costfun = @(x) Cost_Fn(x, discharge1_fit);
 nlcfun = @(x) nonlinconst(x, Qnom);
 
-% Fit parameters
-[thetaOpt,RMS_opt]=ga(costfun,18,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
+% Fit parameters - 17 variables
+[thetaOpt,RMS_opt]=ga(costfun,17,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
+% [thetaOpt,RMS_opt] = ga(costfun, 17, A, b, [], [], thetaLB, thetaUB, ...
+%                     nlcfun, options); % All constraints
+% [thetaOpt,RMS_opt] = ga(handle, 17, A, b, [], [], thetaLB, thetaUB,[],options); % Linear constraints
+% [thetaOpt,RMS_opt] = ga(costfun, 17,[],[],[],[], thetaLB, thetaUB,[],options); % Unconstrained
+
+% Fit parameters - 18 variables
+% [thetaOpt,RMS_opt]=ga(costfun,18,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
 % [thetaOpt,RMS_opt] = ga(costfun, 18, A, b, [], [], thetaLB, thetaUB, ...
 %                     nlcfun, options); % All constraints
 % [thetaOpt,RMS_opt] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB,[],options); % Linear constraints
@@ -82,17 +96,17 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5_23_1515.mat', 'thetaOpt', 'RMS_opt');
+save('results_5_23_2110.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
-% load('results_5_23_1400.mat')
+% load('results_5_23_1515.mat')
 % load('../Data/theta_ga_robert_optimal.mat')
 % theta_ga_robert = theta_ga;
 
 %% Plot Results
 % 
 % % Run simulation
-% Vopt = SPM(thetaOpt, discharge1_fit);
+% Vopt = SPM_17(thetaOpt, discharge1_fit);
 % 
 % 
 % % % Calculate RMS
@@ -111,7 +125,7 @@ save('results_5_23_1515.mat', 'thetaOpt', 'RMS_opt');
 % 
 % % Calculate capacities
 % F = 96485;
-% Qn_opt = thetaOpt(12)*F*thetaOpt(5)*thetaOpt(1)*thetaOpt(10)*(thetaOpt(6)-thetaOpt(7))/3600;
+% % Qn_opt = thetaOpt(12)*F*thetaOpt(5)*thetaOpt(1)*thetaOpt(10)*(thetaOpt(6)-thetaOpt(7))/3600;
 % Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaOpt(8))/3600;
 
 
@@ -160,9 +174,9 @@ save('results_5_23_1515.mat', 'thetaOpt', 'RMS_opt');
 % plot(UDDS_val(:,1), V_UDDS)
 % ylabel('Voltage (V')
 % title(sprintf('UDDS : RMS %.3f%%', RMS_UDDS))
-
-
-
+% 
+% 
+% 
 
 
 

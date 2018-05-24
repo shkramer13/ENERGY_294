@@ -29,7 +29,12 @@ function x = get_theta0()
     
     Rc = 6e-4 / Acell;
     
-    x = [Ln Lp Rn Rp Acell x100n x0n y100p y0p Csn_max Csp_max eps_sn ...
+    % 18 Parameters
+%     x = [Ln Lp Rn Rp Acell x100n x0n y100p y0p Csn_max Csp_max eps_sn ...
+%             eps_sp i0n i0p Dsn Dsp Rc];
+
+    % 17 Parameters
+    x = [Ln Lp Rn Rp Acell x100n y100p y0p Csn_max Csp_max eps_sn ...
             eps_sp i0n i0p Dsn Dsp Rc];
 
 end

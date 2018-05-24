@@ -1,6 +1,7 @@
 function err = Cost_Fn(theta, data)
 
-    V_spm = SPM(theta, data);
+%     V_spm = SPM(theta, data);
+    V_spm = SPM_17(theta, data);
     
     V_data = data(:,3);
     
