@@ -80,7 +80,8 @@ A = [-1, 1, zeros(1, 15);
 b = [0; 0];
 
 % Define anonymous functions
-costfun = @(x) Cost_Fn(x, discharge1_fit);
+costfun = @(x) Cost_Fn(x, discharge1_fit, 1);
+% costfun = @(x) Cost_Fn(x, discharge1_fit);
 nlcfun = @(x) nonlinconst(x, Qnom);
 
 % Fit parameters - 17 variables
@@ -135,59 +136,104 @@ F = 96485;
 Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaOpt(8))/3600;
 
 
+%% Problem 2 - Validation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Validation
-% 
-% % Prep data
-% discharge2_val = clean_data(discharge2);
-% discharge5_val = clean_data(discharge5);
-% UDDS_val = UDDS(73066:104620,:);
-% UDDS_val(:,1) = UDDS_val(:,1) - min(UDDS_val(:,1));
-% US06_val = US06(98042:120874,:);
-% US06_val(:,1) = US06_val(:,1) - min(US06_val(:,1));
-% 
-% % Simulate
-% V_2C = SPM(thetaOpt, discharge2_val);
-% V_5C = SPM(thetaOpt, discharge5_val);
-% V_UDDS = SPM(thetaOpt, UDDS_val);
-% 
-% % Calculate Error
-% RMS_2C = calc_RMS(discharge2_val(:,3), V_2C);
-% RMS_5C = calc_RMS(discharge5_val(:,3), V_5C);
-% RMS_UDDS = calc_RMS(UDDS_val(:,3), V_UDDS);
-% 
-% % Plot
-% figure
-% 
-% subplot(3,1,1)
-% hold on
-% plot(discharge2_val(:,1), discharge2_val(:,3))
-% plot(discharge2_val(:,1), V_2C)
-% ylabel('Voltage (V')
-% legend('Exp. Data','Model')
-% title(sprintf('2C Discharge: RMS %.3f%%', RMS_2C))
-% 
-% subplot(3,1,2)
-% hold on
-% plot(discharge5_val(:,1), discharge5_val(:,3))
-% plot(discharge5_val(:,1), V_5C)
-% ylabel('Voltage (V')
-% title(sprintf('5C Discharge: RMS %.3f%%', RMS_5C))
-% 
-% subplot(3,1,3)
-% hold on
-% plot(UDDS_val(:,1), UDDS_val(:,3))
-% plot(UDDS_val(:,1), V_UDDS)
-% ylabel('Voltage (V')
-% title(sprintf('UDDS : RMS %.3f%%', RMS_UDDS))
-% 
-% 
-% 
+%% 2a) 2C Capacity Test
+
+% Pull discharge data
+discharge2_val = clean_data(discharge2);
+
+% Simulate
+V_2C = SPM_17(thetaOpt, discharge2_val);
+
+% Calculate Error
+RMS_2C = calc_RMS(discharge2_val(:,3), V_2C);
+
+% Plot
+figure
+hold on
+plot(discharge2_val(:,1), discharge2_val(:,3))
+plot(discharge2_val(:,1), V_2C)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('2C Discharge: RMS %.3f%%', RMS_2C))
+
+%% 2b) 5C Capacity Test
+
+% Pull discharge data
+discharge5_val = clean_data(discharge5);
+
+% Simulate
+V_5C = SPM_17(thetaOpt, discharge5_val);
+
+% Calculate Error
+RMS_5C = calc_RMS(discharge5_val(:,3), V_5C);
+
+% Plot
+figure
+hold on
+plot(discharge5_val(:,1), discharge5_val(:,3))
+plot(discharge5_val(:,1), V_2C)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('5C Discharge: RMS %.3f%%', RMS_5C))
+
+%% 2c) UDDS Test
+
+% Pull discharge data - indices identified by visual inspection
+UDDS_val = UDDS(73066:98115,:);
+UDDS_val(:,1) = UDDS_val(:,1) - min(UDDS_val(:,1));
+
+% Simulate
+V_UDDS = SPM(thetaOpt, UDDS_val);
+
+% Calculate RMS
+RMS_UDDS = calc_RMS(UDDS_val(:,3), V_UDDS);
+
+% Plot
+figure
+hold on
+plot(UDDS_val(:,1), UDDS_val(:,3))
+plot(UDDS_val(:,1), V_UDDS)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('UDDS Test: RMS %.3f%%', RMS_UDDS))
+
+%% 2d) US06
+
+% Pull discharge data - indices identified by visual inspection
+US06_val = US06(98042:120874,:);
+US06_val(:,1) = US06_val(:,1) - min(US06_val(:,1));
+
+% Create Voc-SOC relationship with 0.025C discharge data
+discharge025_clean = clean_data(discharge025);
+SOC_025 = 1 - cumtrapz(discharge025_clean(:,1), discharge025_clean(:,2))/...
+            trapz(discharge025_clean(:,1), discharge025_clean(:,2));
+
+% Interpolate initial SOC
+SOC0_US06 = interp1(discharge025_clean(:,3), SOC_025, US06_val(1,3));
+
+% Simulate
+V_US06 = SPM_17(thetaOpt, US06_val, SOC0_US06);
+
+% Calculate RMS
+RMS_US06 = calc_RMS(US06_val(:,3), V_US06);
+
+% Plot
+figure
+hold on
+plot(US06_val(:,1), US06_val(:,3))
+plot(US06_val(:,1), V_US06)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('US06 Test: RMS %.3f%%', RMS_US06))
 
 
+%% Problem 3 - Sensitivity Analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
+%% 
 
 
 %% Compare Models

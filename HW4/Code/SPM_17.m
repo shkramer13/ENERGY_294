@@ -1,4 +1,4 @@
-function V_batt = SPM_17(theta, data)
+function V_batt = SPM_17(theta, data, SOC0)
 
 %% Parameters
 
@@ -106,10 +106,11 @@ u0p_results = zeros(1, tdim);
 
 phi_e = 0.01;
 
-Csn(:, 1) = x100n * Csn_max; 
-Csp(:, 1) = y100p * Csp_max;
-% Csn(1:N, 1) = x100n * Csn_max;
-% Csp(1:N, 1) = y100p * Csp_max;
+Csn(:,1) = SOC0*x100n*Csn_max;
+Csp(:,1) = SOC0*y100p*Csp_max;
+% Csn(:, 1) = x100n * Csn_max; 
+% Csp(:, 1) = y100p * Csp_max;
+
 
 %% Concentration Dynamics - Lecture Version
 
