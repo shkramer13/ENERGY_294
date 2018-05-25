@@ -67,7 +67,7 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 % load('../Data/bounds_17.mat') % Robert's bounds - 17 parameters
 
 % Set solver options
-options = gaoptimset('Generations', 5000, 'Display', 'iter');
+options = gaoptimset('Generations', 100, 'Display', 'iter');
 
 % Create matrices for inequality constraints
 % 18 parameters
