@@ -101,7 +101,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('../Data/results_5_24_2120.mat', 'thetaOpt', 'RMS_opt');
+save('../Data/results_5_24_2130.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data
 % load('../Data/results_5_23_1515.mat')
@@ -109,30 +109,30 @@ save('../Data/results_5_24_2120.mat', 'thetaOpt', 'RMS_opt');
 % theta_ga_robert = theta_ga;
 
 %% Plot Results
-
-% Run simulation
-thetaOpt = [thetaOpt(1:6), thetaOpt(8:end)];
-Vopt = SPM_17(thetaOpt, discharge1_fit);
-
-
-% % Calculate RMS
-% Vopt = SPM(theta_ga_robert, discharge1_fit);
-% RMS_robert = calc_RMS(discharge1_fit(:,3), Vopt)
-
-% Plot results
-figure
-hold on
-plot(discharge1_fit(:,1), discharge1_fit(:,3))
-plot(discharge1_fit(:,1), Vopt)
-legend('Experimental Data', 'Model Simulation')
-xlabel('Time (sec)')
-ylabel('Voltage (V)')
-title(sprintf('1C Discharge Fitting Results: RMS %.3f%%', RMS_opt))
-
-% Calculate capacities
-F = 96485;
-% Qn_opt = thetaOpt(12)*F*thetaOpt(5)*thetaOpt(1)*thetaOpt(10)*(thetaOpt(6)-thetaOpt(7))/3600;
-Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaOpt(8))/3600;
+% 
+% % Run simulation
+% thetaOpt = [thetaOpt(1:6), thetaOpt(8:end)];
+% Vopt = SPM_17(thetaOpt, discharge1_fit);
+% 
+% 
+% % % Calculate RMS
+% % Vopt = SPM(theta_ga_robert, discharge1_fit);
+% % RMS_robert = calc_RMS(discharge1_fit(:,3), Vopt)
+% 
+% % Plot results
+% figure
+% hold on
+% plot(discharge1_fit(:,1), discharge1_fit(:,3))
+% plot(discharge1_fit(:,1), Vopt)
+% legend('Experimental Data', 'Model Simulation')
+% xlabel('Time (sec)')
+% ylabel('Voltage (V)')
+% title(sprintf('1C Discharge Fitting Results: RMS %.3f%%', RMS_opt))
+% 
+% % Calculate capacities
+% F = 96485;
+% % Qn_opt = thetaOpt(12)*F*thetaOpt(5)*thetaOpt(1)*thetaOpt(10)*(thetaOpt(6)-thetaOpt(7))/3600;
+% Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaOpt(8))/3600;
 
 
 
