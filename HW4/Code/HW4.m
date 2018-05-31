@@ -15,88 +15,34 @@ discharge1_fit = clean_data(discharge1);
 
 Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 
-
-%% Test Model
-% 
-% % Robert's optimal values
-% % load('../Data/theta_ga_working.mat')
-% % Vtest = SPM(theta_ga, discharge1_fit)';
-% 
-% % Initial guess
-% theta0 = get_theta0();
-% % V0 = SPM(theta0, discharge1_fit); % 18 parameters
-% V0 = SPM_17(theta0, discharge1_fit); % 17 parameters
-% 
-% % Bounds
-% [LB, UB] = get_theta_bounds();
-% % 18 parameters
-% % Vlb = SPM(LB, discharge1_fit);
-% % Vub = SPM(UB, discharge1_fit);
-% % 17 parameters
-% Vlb = SPM_17(LB, discharge1_fit);
-% Vub = SPM_17(UB, discharge1_fit);
-% 
-% % Plot results
-% figure
-% hold on
-% plot(discharge1_fit(:,1), discharge1_fit(:,3))
-% plot(discharge1_fit(:,1), V0)
-% plot(discharge1_fit(:,1), Vlb)
-% plot(discharge1_fit(:,1), Vub)
-% xlabel('Time (sec)')
-% ylabel('Voltage (V)')
-% legend('Experimental Data', 'Initial Guess', 'Lower Bound', 'Upper Bound')
-% ylim([0, 5])
-% 
-% % Calculate capacities
-% F = 96485;
-% % 18 parameters
-% % Qn_test = theta0(12)*F*theta0(5)*theta0(1)*theta0(10)*(theta0(6)-theta0(7))/3600;
-% % Qp_test = theta0(13)*F*theta0(5)*theta0(2)*theta0(11)*(theta0(9)-theta0(8))/3600;
-% % 17 parameters
-% Qp_test = theta0(12)*F*theta0(5)*theta0(2)*theta0(10)*(theta0(8)-theta0(7))/3600;
-% 
-% % Calculate RMS
-% RMS_test = sqrt(mean((V0 - discharge1_fit(:,3)).^2)) / mean(discharge1_fit(:,3)) * 100;
-
 %% Parameter Identification
 
 % Set upper and lower bounds
 [thetaLB, thetaUB] = get_theta_bounds();
-% load('../Data/bounds.mat') % Robert's bounds
-% load('../Data/bounds_17.mat') % Robert's bounds - 17 parameters
 
 % Set solver options
 options = gaoptimset('Generations', 10, 'Display', 'iter');
 
-% Create matrices for inequality constraints
-% 18 parameters
-% A = [-1, 1, zeros(1, 16);
-%      zeros(1, 9), 1, -1, zeros(1, 7)];
-% b = [0; 0];
-% 17 parameters
-A = [-1, 1, zeros(1, 15);
-     zeros(1, 8), 1, -1, zeros(1, 7)];
-b = [0; 0];
-
 % Define anonymous functions
 costfun = @(x) Cost_Fn(x, discharge1_fit, 1);
-% costfun = @(x) Cost_Fn(x, discharge1_fit);
 nlcfun = @(x) nonlinconst(x, Qnom);
 
+% Note: upper and lower bounds on the parameters enforce the 1st and 2nd
+% constraint, i.e. the upper bound for Lp is less than the lower bound for
+% Ln and the upper bound for Csn_max is less than the lower bound for
+% Csp_max
+
 % Fit parameters - 17 variables
-% [thetaOpt,RMS_opt]=ga(costfun,17,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
-% [thetaOpt,RMS_opt] = ga(costfun, 17, A, b, [], [], thetaLB, thetaUB, ...
-%                     nlcfun, options); % All constraints
-% [thetaOpt,RMS_opt] = ga(handle, 17, A, b, [], [], thetaLB, thetaUB,[],options); % Linear constraints
-[thetaOpt,RMS_opt] = ga(costfun, 17,[],[],[],[], thetaLB, thetaUB,[],options); % Unconstrained
+[thetaOpt,RMS_opt]=ga(costfun,17,[],[],[],[],thetaLB,thetaUB,nlcfun,...
+                      options); % Nonlinear constraints
+% [thetaOpt,RMS_opt] = ga(costfun, 17,[],[],[],[], thetaLB, thetaUB,[],...
+%                         options); % Unconstrained
 
 % Fit parameters - 18 variables
-% [thetaOpt,RMS_opt]=ga(costfun,18,[],[],[],[],thetaLB,thetaUB,nlcfun,options); % Nonlinear constraints
-% [thetaOpt,RMS_opt] = ga(costfun, 18, A, b, [], [], thetaLB, thetaUB, ...
-%                     nlcfun, options); % All constraints
-% [thetaOpt,RMS_opt] = ga(handle, 18, A, b, [], [], thetaLB, thetaUB,[],options); % Linear constraints
-% [thetaOpt,RMS_opt] = ga(costfun, 18,[],[],[],[], thetaLB, thetaUB,[],options); % Unconstrained
+% [thetaOpt,RMS_opt]=ga(costfun,18,[],[],[],[],thetaLB,thetaUB,nlcfun,...
+%                       options); % Nonlinear constraints
+% [thetaOpt,RMS_opt]=ga(costfun, 18,[],[],[],[], thetaLB, thetaUB,[],...
+%                       options); % Unconstrained
 
 
 %% Load or Save Results
@@ -104,21 +50,16 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 % Save results
 % save('../Data/results_5_24_2130.mat', 'thetaOpt', 'RMS_opt');
 
-% Load data
+% Load data from previous runs
 load('../Data/results_5_24_2130.mat')
-% load('../Data/theta_ga_robert_optimal.mat')
-% theta_ga_robert = theta_ga;
+
+% Cut out x0n if needed from previous 18-parameter fitting trials 
+% thetaOpt = [thetaOpt(1:6), thetaOpt(8:end)];
 
 %% Plot Results
 
 % Run simulation
-% thetaOpt = [thetaOpt(1:6), thetaOpt(8:end)];
-Vopt = SPM_17(thetaOpt, discharge1_fit);
-
-
-% % Calculate RMS
-% Vopt = SPM(theta_ga_robert, discharge1_fit);
-% RMS_robert = calc_RMS(discharge1_fit(:,3), Vopt)
+Vopt = SPM_17(thetaOpt, discharge1_fit, 1);
 
 % Plot results
 figure
@@ -144,11 +85,18 @@ Qp_opt = thetaOpt(13)*F*thetaOpt(5)*thetaOpt(2)*thetaOpt(11)*(thetaOpt(9)-thetaO
 % Pull discharge data
 discharge2_val = clean_data(discharge2);
 
+% Fix capacity
+theta2C = thetaOpt;
+theta2C(1) = 1.015*theta2C(1);
+
 % Simulate
-V_2C = SPM_17(thetaOpt, discharge2_val);
+V_2C = SPM_17(thetaOpt, discharge2_val, 1);
+V_2C_adj = SPM_17(theta2C, discharge2_val, 1);
+
 
 % Calculate Error
 RMS_2C = calc_RMS(discharge2_val(:,3), V_2C);
+RMS_2C_adj = calc_RMS(discharge2_val(:,3), V_2C_adj);
 
 % Plot
 figure
@@ -158,26 +106,50 @@ plot(discharge2_val(:,1), V_2C)
 ylabel('Voltage (V')
 legend('Experiment Data','Model Simulation')
 title(sprintf('2C Discharge: RMS %.3f%%', RMS_2C))
+ylim([2, 4.3])
+
+figure
+hold on
+plot(discharge2_val(:,1), discharge2_val(:,3))
+plot(discharge2_val(:,1), V_2C_adj)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('2C Discharge (adjusted L_n): RMS %.3f%%', RMS_2C_adj))
 
 %% 2b) 5C Capacity Test
 
 % Pull discharge data
 discharge5_val = clean_data(discharge5);
 
+% Fix capacity
+theta5C = thetaOpt;
+theta5C(1) = 1.15*theta5C(1);
+
 % Simulate
-V_5C = SPM_17(thetaOpt, discharge5_val);
+V_5C_adj = SPM_17(theta5C, discharge5_val, 1);
+V_5C = SPM_17(thetaOpt, discharge5_val, 1);
 
 % Calculate Error
 RMS_5C = calc_RMS(discharge5_val(:,3), V_5C);
+RMS_5C_adj = calc_RMS(discharge5_val(:,3), V_5C_adj);
 
 % Plot
 figure
 hold on
 plot(discharge5_val(:,1), discharge5_val(:,3))
-plot(discharge5_val(:,1), V_2C)
+plot(discharge5_val(:,1), V_5C)
 ylabel('Voltage (V')
 legend('Experiment Data','Model Simulation')
 title(sprintf('5C Discharge: RMS %.3f%%', RMS_5C))
+ylim([2, 4])
+
+figure
+hold on
+plot(discharge5_val(:,1), discharge5_val(:,3))
+plot(discharge5_val(:,1), V_5C_adj)
+ylabel('Voltage (V')
+legend('Experiment Data','Model Simulation')
+title(sprintf('5C Discharge (adjusted L_n): RMS %.3f%%', RMS_5C_adj))
 
 %% 2c) UDDS Test
 
@@ -186,7 +158,7 @@ UDDS_val = UDDS(73066:98115,:);
 UDDS_val(:,1) = UDDS_val(:,1) - min(UDDS_val(:,1));
 
 % Simulate
-V_UDDS = SPM(thetaOpt, UDDS_val);
+V_UDDS = SPM_17(thetaOpt, UDDS_val, 1);
 
 % Calculate RMS
 RMS_UDDS = calc_RMS(UDDS_val(:,3), V_UDDS);
@@ -207,12 +179,18 @@ US06_val = US06(98042:120874,:);
 US06_val(:,1) = US06_val(:,1) - min(US06_val(:,1));
 
 % Create Voc-SOC relationship with 0.025C discharge data
-discharge025_clean = clean_data(discharge025);
+% Select discharge data
+discharge025_clean = clean_data(discharge025); 
+% Calculate SOC values
 SOC_025 = 1 - cumtrapz(discharge025_clean(:,1), discharge025_clean(:,2))/...
             trapz(discharge025_clean(:,1), discharge025_clean(:,2));
-
+% Put discharge data into bins of unique Voc for lookup
+edges = 0:0.001:1.001;
+groups = discretize(SOC_025, edges);
+Voc_025 = splitapply(@mean, discharge025_clean(:,3), groups);
+SOC_025 = edges(1:(end-1));
 % Interpolate initial SOC
-SOC0_US06 = interp1(discharge025_clean(:,3), SOC_025, US06_val(1,3));
+SOC0_US06 = interp1(Voc_025, SOC_025, US06_val(1,3));
 
 % Simulate
 V_US06 = SPM_17(thetaOpt, US06_val, SOC0_US06);
@@ -233,51 +211,78 @@ title(sprintf('US06 Test: RMS %.3f%%', RMS_US06))
 %% Problem 3 - Sensitivity Analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% 
+%% Calculate Sensitivities
+
+sens_up = zeros(1, length(thetaOpt));
+sens_down = zeros(1, length(thetaOpt));
+
+% Iterate through parameters
+for i = 1:length(thetaOpt)
+    
+    % Iterator for +10% and -10%
+    for j = 1:2
+    
+        % Increase or decrease paramter by 10%
+        currTheta = thetaOpt;
+        if j == 1
+            currTheta(i) = 1.1 * currTheta(i);
+        else 
+            currTheta(i) = 0.9 * currTheta(i);
+        end
+
+        % Simulate
+        V_curr = SPM_17(currTheta, discharge1_fit, 1);
+
+        % Calculate Sensitivity
+        dy = norm((V_curr - discharge1_fit(:,3)) ./ discharge1_fit(:,3));
+        dtheta = norm((currTheta - thetaOpt) ./ thetaOpt);
+        
+        % Store results
+        if j == 1
+            sens_up(i) = dy/dtheta;
+        else
+            sens_down(i) = dy/dtheta;
+        end
+        
+    end
+end
 
 
-%% Compare Models
+%% Generate Plots
 
-% load('../Data/theta_ga_working.mat')
-% theta_ga_rs = theta_ga;
-% 
-% % Sam's model
-% Vsam = SPM(theta_ga_rs, discharge1_fit);
-% Vsam = Vsam';
-% 
-% % Justin's model
-% Vjustin = SPM_justin_new(theta_ga_rs, discharge1_fit(:,1), discharge1_fit(:,2), 1);
-% 
-% figure
-% hold on
-% plot(discharge1_fit(:,1), discharge1_fit(:,3))
-% plot(discharge1_fit(:,1), Vsam)
-% plot(discharge1_fit(:,1), Vjustin)
-% legend('Data', 'Sam', 'Justin')
-% ylim([0, 5])
+% Enter indices and variable names after picking the most sensitive terms
+sens_indices = [1 4 9];
+varnames = string({'L_n', 'R_p', 'C_{s,max,n}'});
 
+for i = 1:length(sens_indices)
+    
+    figure
+    hold on
+   
+    % Plot baseline
+    currTheta = thetaOpt;
+    currV = SPM_17(currTheta, discharge1_fit, 1);
+    plot(discharge1_fit(:,1), currV)
+    
+    % Plot 10% decrease
+    currTheta = thetaOpt;
+    currTheta(sens_indices(i)) = 0.9*currTheta(sens_indices(i));
+    currV = SPM_17(currTheta, discharge1_fit, 1);
+    plot(discharge1_fit(:,1), currV)
+    
+    % Plot 10% increase
+    currTheta = thetaOpt;
+    currTheta(sens_indices(i)) = 1.1*currTheta(sens_indices(i));
+    currV = SPM_17(currTheta, discharge1_fit, 1);
+    plot(discharge1_fit(:,1), currV)
+    
+    xlabel('Time (sec)')
+    ylabel('Voltage (V)')
+    legend('Baseline', '10% decrease', '10% increase')
+    ylim([2.4, 4.3])
+    title(strcat(string('Sensitivity Analysis: '),varnames(i)))
+    
+end
 
-%% Testing U0n and U0p
-
-% x = linspace(0, 1);
-% y = linspace(0, 1);
-% 
-% for i=1:length(x)
-%     U0neg(i) = U0n(x(i));
-% end
-% for i=1:length(y)
-%     U0pos(i) = U0p(y(i));
-% end
-% 
-% figure
-% subplot(1,2,1)
-% plot(x, U0neg)
-% ylim([0, 1.5])
-% title('Anode')
-% subplot(1,2,2)
-% plot(y, U0pos)
-% xlim([0.3, 1])
-% ylim([3.4, 4.4])
-% title('Cathode')
 
 
