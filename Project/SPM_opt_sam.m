@@ -1,13 +1,11 @@
-%% Problem 1
+%%
 
 clear all
 close all
 clc
 
-cd('~/Dropbox/School/Spring/ENERGY 294/ENERGY_294/HW4/Code')
-
 %% Read Data
-load('../Data/HW4_Data.mat')
+load('HW4_Data.mat')
 
 discharge1_fit = clean_data(discharge1);
 
@@ -21,7 +19,7 @@ Qnom = trapz(discharge1_fit(:,1), discharge1_fit(:,2)) / 3600;
 [thetaLB, thetaUB] = get_theta_bounds();
 
 % Set solver options
-options = gaoptimset('Generations', 10, 'Display', 'iter');
+options = gaoptimset('Generations', 100, 'Display', 'iter');
 
 % Define anonymous functions
 costfun = @(x) Cost_Fn(x, discharge1_fit, 1);
@@ -48,7 +46,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-% save('../Data/results_5_24_2130.mat', 'thetaOpt', 'RMS_opt');
+save('results_35grid_6_1_1315.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data from previous runs
 % load('../Data/results_5_24_2130.mat')
@@ -206,83 +204,4 @@ plot(US06_val(:,1), V_US06)
 ylabel('Voltage (V')
 legend('Experiment Data','Model Simulation')
 title(sprintf('US06 Test: RMS %.3f%%', RMS_US06))
-
-
-%% Problem 3 - Sensitivity Analysis
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Calculate Sensitivities
-
-sens_up = zeros(1, length(thetaOpt));
-sens_down = zeros(1, length(thetaOpt));
-
-% Iterate through parameters
-for i = 1:length(thetaOpt)
-    
-    % Iterator for +10% and -10%
-    for j = 1:2
-    
-        % Increase or decrease paramter by 10%
-        currTheta = thetaOpt;
-        if j == 1
-            currTheta(i) = 1.1 * currTheta(i);
-        else 
-            currTheta(i) = 0.9 * currTheta(i);
-        end
-
-        % Simulate
-        V_curr = SPM_17(currTheta, discharge1_fit, 1);
-
-        % Calculate Sensitivity
-        dy = norm((V_curr - discharge1_fit(:,3)) ./ discharge1_fit(:,3));
-        dtheta = norm((currTheta - thetaOpt) ./ thetaOpt);
-        
-        % Store results
-        if j == 1
-            sens_up(i) = dy/dtheta;
-        else
-            sens_down(i) = dy/dtheta;
-        end
-        
-    end
-end
-
-
-%% Generate Plots
-
-% Enter indices and variable names after picking the most sensitive terms
-sens_indices = [1 4 9];
-varnames = string({'L_n', 'R_p', 'C_{s,max,n}'});
-
-for i = 1:length(sens_indices)
-    
-    figure
-    hold on
-   
-    % Plot baseline
-    currTheta = thetaOpt;
-    currV = SPM_17(currTheta, discharge1_fit, 1);
-    plot(discharge1_fit(:,1), currV)
-    
-    % Plot 10% decrease
-    currTheta = thetaOpt;
-    currTheta(sens_indices(i)) = 0.9*currTheta(sens_indices(i));
-    currV = SPM_17(currTheta, discharge1_fit, 1);
-    plot(discharge1_fit(:,1), currV)
-    
-    % Plot 10% increase
-    currTheta = thetaOpt;
-    currTheta(sens_indices(i)) = 1.1*currTheta(sens_indices(i));
-    currV = SPM_17(currTheta, discharge1_fit, 1);
-    plot(discharge1_fit(:,1), currV)
-    
-    xlabel('Time (sec)')
-    ylabel('Voltage (V)')
-    legend('Baseline', '10% decrease', '10% increase')
-    ylim([2.4, 4.3])
-    title(strcat(string('Sensitivity Analysis: '),varnames(i)))
-    
-end
-
-
 
