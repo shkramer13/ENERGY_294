@@ -38,7 +38,7 @@ N = 5;
 [thetaLB, thetaUB] = get_theta_bounds();
 
 % Set solver options
-options = gaoptimset('Generations', 100, 'Display', 'iter');
+options = gaoptimset('Generations', 200, 'Display', 'iter');
 
 % Define anonymous functions
 costfun = @(x) Cost_Fn(x, discharge1_fit, N, 1);
@@ -65,7 +65,7 @@ nlcfun = @(x) nonlinconst(x, Qnom);
 %% Load or Save Results
 
 % Save results
-save('results_5grid_6_5_1530.mat', 'thetaOpt', 'RMS_opt');
+save('results_5grid_6_6_1245.mat', 'thetaOpt', 'RMS_opt');
 
 % Load data from previous runs
 % load('results_35grid_6_1_1315.mat')
